@@ -1,0 +1,31 @@
+Paper ID,Title,Abstract,PDF URL,Author1 First,Author1 Middle,Author1 Last,Author1 Affiliation,Author1 Email,Author2 First,Author2 Middle,Author2 Last,Author2 Affiliation,Author2 Email,Author3 First,Author3 Middle,Author3 Last,Author3 Affiliation,Author3 Email,Author4 First,Author4 Middle,Author4 Last,Author4 Affiliation,Author4 Email,Author5 First,Author5 Middle,Author5 Last,Author5 Affiliation,Author5 Email,Author6 First,Author6 Middle,Author6 Last,Author6 Affiliation,Author6 Email,Author7 First,Author7 Middle,Author7 Last,Author7 Affiliation,Author7 Email,Author8 First,Author8 Middle,Author8 Last,Author8 Affiliation,Author8 Email,Author9 First,Author9 Middle,Author9 Last,Author9 Affiliation,Author9 Email,Author10 First,Author10 Middle,Author10 Last,Author10 Affiliation,Author10 Email
+0,Psychmet- Measurement Foundational Competencies ChatBot,"PsychMet is a domain-grounded chatbot that uses a GPT-4.1 conversational model with retrieval-augmented generation over a curated psychometrics corpus, with emphasis on IRT and NCME competencies. Using the RAGAS framework on a 30-question set, PsychMet achieved an Overall score of 0.539, with strengths in Answer Correctness (0.810) and Context Recall (0.671), moderate Faithfulness (0.588), and weaknesses in Answer Relevancy (0.284), Context Precision (0.425), and Context Relevancy (0.474). This pattern suggests that retrieval breadth is outpacing specificity. We outline targeted fixes — such as hybrid sparse+dense retrieval with light filtering and question-first prompting — to tighten focus without sacrificing coverage. PsychMet is accurate and transparently sourced for exploratory learning; with retrieval tightening and answer scoping, it can better support time-bound professional workflows.",,Henry,,Makinde,"University of North Carolina, Greensboro",hsmakinde@uncg.edu,Hope,,Adegoke,"University of North Carolina, Greensboro",hoadegoke@uncg.edu,Mubarak,,Mojoyinola,"University of Iowa, Iowa City",mubarak-mojoyinola@uiowa.edu,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+1,Stochastic Constrained Test Assembly for AI-Enabled Assessment Systems,"Test assembly, the process of constructing a
+complete test form from an item pool subject
+to blueprint constraints, has traditionally been
+treated as a static optimization problem. In
+AI-enabled assessment environments, however,
+item pools evolve continuously as newly generated
+items enter with uncertain psychometric
+parameters, and delivery is on demand. These
+conditions make test assembly a sequential
+decision-making problem under uncertainty:
+which form should be deployed now, given current
+but incomplete knowledge of item quality,
+to simultaneously maximize measurement
+precision, satisfy content-blueprint constraints,
+maintain pool sustainability, and accelerate calibration
+of uncertain new items? This paper
+proposes the Stochastic Constrained Hybrid
+(SCH) framework as a principled answer to this
+question. SCH recasts form-level assembly as a
+multi-armed bandit (MAB) problem with Fisher
+information as the reward, extending recent
+item-level approaches in computerized adaptive
+testing (CAT) to the form-level setting. A
+simulation study comparing six test assembly
+methods is also presented. The main contribution
+of this paper is a framework for incorporating
+items with uncertain parameters into the
+automatic test assembly process for linear test
+forms.",https://drive.google.com/file/d/1ShlT6fXRZnBw-QozeEcz7ikTVkIvIwFJ/view?usp=drivesdk,Alina A.,,von Davier,Duolingo,avondavier@duolingo.com,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
