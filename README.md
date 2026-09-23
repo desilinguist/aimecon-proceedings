@@ -16,7 +16,8 @@ PDFs:
 Before anything here works, collect the following files from the program
 chairs. Put them all in one folder named after the year, e.g. `aimecon2026`.
 The `examples/aimecon2026/` folder in this repo shows a complete, working
-layout with real (trimmed) files.
+layout with real (trimmed) files. Please refer to this folder as a reference
+for creating files for future years. 
 
 ### Paper metadata and PDFs
 
