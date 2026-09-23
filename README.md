@@ -84,11 +84,32 @@ for creating files for future years.
    ```
 
    or see the uv docs for other platforms.
-2. A TeX distribution with `pdflatex`, e.g.
-   [MacTeX](https://www.tug.org/mactex/) or BasicTeX on macOS, TeX Live on
-   Linux.
+2. A TeX distribution with `pdflatex`. On macOS, install
+   [BasicTeX](https://www.tug.org/mactex/morepackages.html) using the
+   `BasicTeX.pkg` installer (this is the setup these instructions are tested
+   with), then install the packages the aclpub2 template needs:
+
+   ```
+   sudo tlmgr update --self
+   sudo tlmgr install enumitem fancyhdr geometry hyperref eurosym vntex \
+       multicol pdfpages pax psnfss babel babel-english babel-latin \
+       etoolbox oberdiek amsfonts graphics tools
+   ```
+
+   The full [MacTeX](https://www.tug.org/mactex/) distribution also works
+   and already contains everything above. On Linux, install TeX Live with
+   the equivalent packages. Check with `which pdflatex`.
 3. A JDK (`java` on the PATH). aclpub2 uses a Java tool called PAX to
-   preserve hyperlinks from the paper PDFs.
+   preserve hyperlinks from the paper PDFs. On macOS:
+
+   ```
+   brew install openjdk
+   sudo ln -sfn "$(brew --prefix)/opt/openjdk/libexec/openjdk.jdk" \
+       /Library/Java/JavaVirtualMachines/openjdk.jdk
+   ```
+
+   The second command lets the system find the Homebrew JDK; without it,
+   `java` may not be on the PATH. Any JDK from version 8 up works.
 
 ## Setup
 
