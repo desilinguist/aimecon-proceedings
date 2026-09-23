@@ -38,7 +38,7 @@ Expected files in <input_dir> (all provided by the conference organizers):
 Writes <input_dir>/volume1, volume2, volume3, each a complete aclpub2 input
 directory ready for:
 
-    python generate <input_dir>/volume<N> --proceedings --overwrite --outdir output/volume<N>
+    python bin/generate <input_dir>/volume<N> --proceedings --overwrite --outdir output/volume<N>
 
 Exits nonzero if any required input is missing or a CSV row has no matching
 PDF. PDFs without a matching CSV row are excluded with a warning.
@@ -661,7 +661,7 @@ def main():
 
     print("\nDone. Next steps:")
     for volume in VOLUMES:
-        print(f"  python generate {input_dir}/volume{volume.number} "
+        print(f"  python bin/generate {input_dir}/volume{volume.number} "
               f"--proceedings --overwrite --outdir output/volume{volume.number}")
 
 

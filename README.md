@@ -144,7 +144,7 @@ uv run prepare_aimecon.py /path/to/aimecon-proceedings/examples/aimecon2026 \
 Then build one volume:
 
 ```
-python generate /path/to/aimecon-proceedings/examples/aimecon2026/volume1 \
+python bin/generate /path/to/aimecon-proceedings/examples/aimecon2026/volume1 \
     --proceedings --overwrite --outdir output/example-volume1
 ```
 
@@ -192,9 +192,9 @@ What the script does:
 Still from the aclpub2 root, build each volume:
 
 ```
-python generate aimecon2026/volume1 --proceedings --overwrite --outdir output/volume1
-python generate aimecon2026/volume2 --proceedings --overwrite --outdir output/volume2
-python generate aimecon2026/volume3 --proceedings --overwrite --outdir output/volume3
+python bin/generate aimecon2026/volume1 --proceedings --overwrite --outdir output/volume1
+python bin/generate aimecon2026/volume2 --proceedings --overwrite --outdir output/volume2
+python bin/generate aimecon2026/volume3 --proceedings --overwrite --outdir output/volume3
 ```
 
 Each `output/volumeN/` contains:
