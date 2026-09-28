@@ -325,6 +325,11 @@ def build_papers(volume, input_dir, out_dir, reporter):
         if not paper_id.isdigit():
             reporter.error(f"{volume.papers_csv} has a row with invalid Paper ID: '{paper_id}'")
             continue
+        if int(paper_id) == 0:
+            reporter.error(f"{volume.papers_csv}: Paper ID 0 is reserved for the front "
+                           f"matter (the ACL Anthology expects 0.pdf to be the front "
+                           f"matter); renumber this paper")
+            continue
         pdf_path = Path(pdf_dir, f"Paper-{paper_id}.pdf")
         if not pdf_path.is_file():
             reporter.error(f"{volume.papers_csv}: no PDF found for Paper ID {paper_id} "

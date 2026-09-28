@@ -32,6 +32,9 @@ for creating files for future years.
   named `Paper-<id>.pdf` where `<id>` matches the `Paper ID` column in the
   CSV. Every CSV row must have a matching PDF, and every PDF should have a
   CSV row. The script checks both directions and reports mismatches.
+  Paper IDs must start at 1: ID 0 is reserved because the ACL Anthology
+  expects `0.pdf` to be the front matter. The script rejects a paper with
+  ID 0, but it is worth confirming with the chairs before submission day.
 
 ### Front matter
 
