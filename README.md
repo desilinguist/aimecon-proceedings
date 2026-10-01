@@ -254,7 +254,10 @@ proceedings, but the front matter is compiled once.
   the original number and prints the proceedings folio on top. The flagged
   paper IDs are listed as warnings at prepare time. Folios in other
   positions (e.g. top right) are not auto-detected; cover them by hand in
-  the template or ask the authors for a PDF without page numbers.
+  the template or ask the authors for a PDF without page numbers. The cover
+  is positioned for A4 pages, so it can miss on non-A4 papers (e.g. US
+  Letter); the prepare step warns about those, and the simplest fix is a
+  revised PDF from the authors.
 - **Table of contents off by a page or two**: a camera-ready PDF has an
   inconsistent page tree (typically from incremental updates leaving
   duplicate object numbers), so different PDF readers disagree on its page

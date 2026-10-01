@@ -463,6 +463,20 @@ def build_papers(volume, input_dir, out_dir, reporter):
         }
         if has_own_page_numbers(pdf_path):
             paper["has_page_numbers"] = True
+            # The cover box in the proceedings template is positioned for A4
+            # pages; on other page sizes (e.g. US Letter) pdfpages shifts the
+            # content and the box can miss the folio. Ask for a revised PDF
+            # instead of covering.
+            from pypdf import PdfReader
+            import warnings as _warnings
+            with _warnings.catch_warnings():
+                _warnings.simplefilter("ignore")
+                media = PdfReader(str(pdf_path)).pages[0].mediabox
+            if abs(float(media.height) - 841.89) > 2 or abs(float(media.width) - 595.28) > 2:
+                reporter.warn(f"{volume.papers_csv} paper {paper_id}: page size "
+                              f"{float(media.width):.0f}x{float(media.height):.0f}pt is not A4; "
+                              f"the page-number cover may not line up. Ask the authors "
+                              f"for a PDF without page numbers")
         papers.append(paper)
 
     papers.sort(key=lambda paper: int(paper["id"]))
