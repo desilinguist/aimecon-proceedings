@@ -379,8 +379,13 @@ def has_own_page_numbers(pdf_path):
             def visitor(text, cm, tm, font_dict, font_size):
                 nonlocal found
                 if text.strip() == str(idx + 1):
-                    x, y = tm[4], tm[5]
-                    if y < 0.12 * height and 0.25 * width < x < 0.75 * width:
+                    # The text matrix alone is in the font's coordinate space;
+                    # combine it with the current transformation matrix to get
+                    # the actual page position. PDFs that rotate or offset
+                    # their content otherwise report wild coordinates.
+                    x = tm[4] * cm[0] + tm[5] * cm[2] + cm[4]
+                    y = tm[4] * cm[1] + tm[5] * cm[3] + cm[5]
+                    if 0 < y < 0.10 * height and 0.3 * width < x < 0.7 * width:
                         found = True
 
             try:
