@@ -247,3 +247,9 @@ proceedings, but the front matter is compiled once.
   structurally incompatible with the old PDFBox bundled with aclpub2. Run
   the prepare step again without `--skip-repair-pdfs`; it rebuilds such
   PDFs automatically.
+- **Table of contents off by a page or two**: a camera-ready PDF has an
+  inconsistent page tree (typically from incremental updates leaving
+  duplicate object numbers), so different PDF readers disagree on its page
+  count and the computed page ranges drift. The prepare step's scan detects
+  this and rewrites the file with PyMuPDF, which resolves the ambiguity the
+  same way pdfTeX does.

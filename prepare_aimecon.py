@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["pyyaml", "pypandoc-binary", "pypdf"]
+# dependencies = ["pyyaml", "pypandoc-binary", "pypdf", "pymupdf"]
 # ///
 """
 Prepare aclpub2 input directories for the three AIME-Con proceedings volumes.
@@ -43,14 +43,22 @@ directory ready for:
 Exits nonzero if any required input is missing or a CSV row has no matching
 PDF. PDFs without a matching CSV row are excluded with a warning.
 
-Before generating anything, every source paper PDF is scanned with PAX (the
-annotation extractor `python generate` uses) and any PDF that PAX's old
-PDFBox cannot parse is rebuilt in place. The rebuild is a pypdf read/write
-round trip that normalizes the internal structure without changing the
-content; page count and extracted text are verified identical before the
-original is replaced. Requires a JDK on the PATH. PDFs that still fail after
-the rebuild are reported as errors and must be re-exported manually (e.g.
-via Preview or Acrobat). Pass --skip-repair-pdfs to skip this scan.
+Before generating anything, every source paper PDF is scanned for two known
+problems and repaired in place if needed:
+
+1. PAX (the annotation extractor `python bin/generate` uses) cannot parse
+   the file. Its PDFBox is from 2008 and chokes on compressed object
+   streams. Fixed with a pypdf read/write round trip.
+2. The page tree is inconsistent (/Count disagrees with the reachable
+   pages), which happens when incremental updates leave duplicate object
+   numbers behind. aclpub2 counts pages with pypdf while pdfTeX may include
+   more, which skews the table of contents. Fixed with a PyMuPDF rewrite,
+   since a pypdf rewrite could drop unreachable pages.
+
+Page count and extracted text are verified identical before an original is
+replaced. Requires a JDK on the PATH. PDFs that still fail after repair are
+reported as errors and must be re-exported manually (e.g. via Preview or
+Acrobat). Pass --skip-repair-pdfs to skip this scan.
 """
 
 import argparse
@@ -284,6 +292,44 @@ def rebuild_pdf(pdf_path):
     return len(after.pages) == len(before.pages) and text_after == text_before
 
 
+def page_tree_is_consistent(pdf_path):
+    """False if the page tree's /Count disagrees with the number of pages
+    pypdf can reach. Incrementally updated PDFs can contain duplicate object
+    numbers (e.g. an xref stream colliding with a page object), which makes
+    readers disagree about the page count; aclpub2 counts pages with pypdf
+    while pdfTeX may include more, skewing the table of contents."""
+    from pypdf import PdfReader
+    try:
+        reader = PdfReader(str(pdf_path))
+        count = reader.trailer["/Root"]["/Pages"].get_object().get("/Count")
+        return count is None or int(count) == len(reader.pages)
+    except Exception:
+        return False
+
+
+def rebuild_pdf_mupdf(pdf_path):
+    """Rewrite the PDF with PyMuPDF, whose parser is more forgiving of broken
+    xref chains than pypdf's. Used when the page tree is inconsistent, where a
+    pypdf rewrite could silently drop pages it cannot reach. Returns True if
+    page count and per-page text are preserved."""
+    import pymupdf
+
+    doc = pymupdf.open(pdf_path)
+    text_before = [doc[i].get_text() for i in range(doc.page_count)]
+    tmp = pdf_path.with_suffix(".rebuilt.pdf")
+    doc.save(tmp, garbage=4, deflate=True)
+    doc.close()
+    check = pymupdf.open(tmp)
+    ok = (check.page_count == len(text_before)
+          and [check[i].get_text() for i in range(check.page_count)] == text_before)
+    check.close()
+    if ok:
+        tmp.replace(pdf_path)
+    else:
+        tmp.unlink(missing_ok=True)
+    return ok
+
+
 def repair_broken_pdfs(input_dir, reporter):
     classpath = pax_classpath(reporter)
     reporter.print_and_exit_if_errors()
@@ -292,19 +338,25 @@ def repair_broken_pdfs(input_dir, reporter):
     for volume in VOLUMES:
         pdfs += sorted(Path(input_dir, volume.papers_dir).glob("Paper-*.pdf"))
 
-    print(f"Scanning {len(pdfs)} paper PDFs with PAX...")
+    print(f"Scanning {len(pdfs)} paper PDFs...")
     with ThreadPoolExecutor(max_workers=os.cpu_count()) as pool:
-        broken = [pdf for pdf, ok in zip(pdfs, pool.map(
-            lambda p: pax_accepts(p, classpath), pdfs)) if not ok]
+        pax_ok = list(pool.map(lambda p: pax_accepts(p, classpath), pdfs))
+        consistent = list(pool.map(page_tree_is_consistent, pdfs))
+    broken = [(pdf, cons) for pdf, ok, cons in zip(pdfs, pax_ok, consistent)
+              if not ok or not cons]
     if not broken:
         print("All paper PDFs passed.\n")
         return
 
-    for pdf in broken:
-        if rebuild_pdf(pdf) and pax_accepts(pdf, classpath):
+    for pdf, was_consistent in broken:
+        # An inconsistent page tree needs the PyMuPDF rewrite; a pypdf clone
+        # can silently drop pages it cannot reach. PAX-only failures get the
+        # pypdf clone, which preserves the /Names tree PAX needs.
+        ok = rebuild_pdf(pdf) if was_consistent else rebuild_pdf_mupdf(pdf)
+        if ok and pax_accepts(pdf, classpath) and page_tree_is_consistent(pdf):
             print(f"repaired {pdf}")
         else:
-            reporter.error(f"{pdf}: PAX cannot parse it and the automatic rebuild "
+            reporter.error(f"{pdf}: PDF is malformed and the automatic rebuild "
                            f"did not help; re-export it manually (e.g. via Preview "
                            f"or Acrobat) and run again")
 
