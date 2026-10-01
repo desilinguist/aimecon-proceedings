@@ -247,6 +247,14 @@ proceedings, but the front matter is compiled once.
   structurally incompatible with the old PDFBox bundled with aclpub2. Run
   the prepare step again without `--skip-repair-pdfs`; it rebuilds such
   PDFs automatically.
+- **A paper shows both its own page number and the proceedings page
+  number**: the camera-ready kept its original folio. The prepare step
+  detects bottom-center folios automatically and flags those papers with
+  `has_page_numbers` in `papers.yml`; the proceedings template then covers
+  the original number and prints the proceedings folio on top. The flagged
+  paper IDs are listed as warnings at prepare time. Folios in other
+  positions (e.g. top right) are not auto-detected; cover them by hand in
+  the template or ask the authors for a PDF without page numbers.
 - **Table of contents off by a page or two**: a camera-ready PDF has an
   inconsistent page tree (typically from incremental updates leaving
   duplicate object numbers), so different PDF readers disagree on its page

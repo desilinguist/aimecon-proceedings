@@ -361,6 +361,37 @@ def repair_broken_pdfs(input_dir, reporter):
                            f"or Acrobat) and run again")
 
 
+def has_own_page_numbers(pdf_path):
+    """True if the PDF prints its own page numbers at bottom center, which
+    would collide with the proceedings folio. The proceedings template covers
+    and redraws the folio for papers flagged with has_page_numbers."""
+    from pypdf import PdfReader
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        reader = PdfReader(str(pdf_path))
+        hits = 0
+        for idx, page in enumerate(reader.pages):
+            width = float(page.mediabox.width)
+            height = float(page.mediabox.height)
+            found = False
+
+            def visitor(text, cm, tm, font_dict, font_size):
+                nonlocal found
+                if text.strip() == str(idx + 1):
+                    x, y = tm[4], tm[5]
+                    if y < 0.12 * height and 0.25 * width < x < 0.75 * width:
+                        found = True
+
+            try:
+                page.extract_text(visitor_text=visitor)
+            except Exception:
+                continue
+            if found:
+                hits += 1
+    return hits >= 2
+
+
 def build_papers(volume, input_dir, out_dir, reporter):
     rows = read_csv_rows(Path(input_dir, volume.papers_csv))
     pdf_dir = Path(input_dir, volume.papers_dir)
@@ -417,14 +448,17 @@ def build_papers(volume, input_dir, out_dir, reporter):
 
         title = to_latex(collapse_whitespace(row["Title"]))
         warn_unsafe_chars(title, f"{volume.papers_csv} paper {paper_id} title", reporter)
-        papers.append({
+        paper = {
             "id": paper_id,
             "title": title,
             "abstract": to_latex(collapse_whitespace(row["Abstract"])),
             "authors": authors,
             "file": f"{paper_id}.pdf",
             "_pdf_path": pdf_path,
-        })
+        }
+        if has_own_page_numbers(pdf_path):
+            paper["has_page_numbers"] = True
+        papers.append(paper)
 
     papers.sort(key=lambda paper: int(paper["id"]))
 
@@ -436,6 +470,12 @@ def build_papers(volume, input_dir, out_dir, reporter):
         if pdf_id not in csv_ids:
             reporter.warn(f"{volume.papers_dir}/{pdf_path.name} has no row in "
                           f"{volume.papers_csv} and will be excluded")
+
+    flagged = [paper["id"] for paper in papers if paper.get("has_page_numbers")]
+    if flagged:
+        reporter.warn(f"{volume.papers_csv}: papers with their own page numbers "
+                      f"(the proceedings will cover them and redraw the folio): "
+                      f"{', '.join(flagged)}")
 
     papers_out_dir = Path(out_dir, "papers")
     papers_out_dir.mkdir(parents=True)
