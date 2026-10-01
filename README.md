@@ -258,6 +258,12 @@ proceedings, but the front matter is compiled once.
   is positioned for A4 pages, so it can miss on non-A4 papers (e.g. US
   Letter); the prepare step warns about those, and the simplest fix is a
   revised PDF from the authors.
+- **Proceedings citation missing from a paper's first page**: the paper's
+  PDF paints an opaque white background rectangle, which hides the
+  watermark when it is typeset in the background (the text stays in the
+  text layer but is invisible). The `aimecon` branch of the template
+  typesets the watermark in the foreground, so it always renders. If you
+  see this with an older checkout, update the branch and rebuild.
 - **Table of contents off by a page or two**: a camera-ready PDF has an
   inconsistent page tree (typically from incremental updates leaving
   duplicate object numbers), so different PDF readers disagree on its page
